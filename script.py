@@ -1,15 +1,22 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 import os
 import time
+import logging
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+# Configuration du logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] %(levelname)s - %(message)s',
+)
+
+logging.info("🚀 - Démarrage du scrapping")
 
 # URL cible (via variable d’environnement)
 url = os.getenv("TARGET_URL", "https://example.com")
 
 # Delay avant la capture
 delay = int(os.getenv("LOAD_DELAY", 3))
-
 
 # Résolutions portrait de smartphones (width x height)
 resolutions = [
@@ -65,7 +72,6 @@ resolutions = [
     (360, 760, "Galaxy_S21_FE"),
 ]
 
-
 output_dir = "screenshots"
 os.makedirs(output_dir, exist_ok=True)
 
@@ -79,26 +85,24 @@ for width, height, model in resolutions:
 
     driver = webdriver.Chrome(options=chrome_options)
 
-    # Charger la page.
+    logging.info(f"{model} {width}x{height} - Chargement de la page {url}")
     driver.get(url)
-    print(f" {model}  {width}x{height} - Chargement de la page...")
     time.sleep(delay)
 
-    # Scroll jusqu'en bas de la page.
+    # Scroll jusqu'en bas de la page
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    # Pause rapide pour acceder en bas de page
-    time.sleep(1)  
-
-    # Obtenir la hauteur totale de la page via JS.
-    scroll_height = driver.execute_script("return document.body.scrollHeight")
-
-    # Redimensionner la fenêtre pour tout voir.
-    driver.set_window_size(width, scroll_height)
-    # Pause rapide pour permettre le redraw
     time.sleep(1)
 
+    # Hauteur totale
+    scroll_height = driver.execute_script("return document.body.scrollHeight")
+
+    # Redimensionner pour voir toute la page
+    driver.set_window_size(width, scroll_height)
+    time.sleep(1)
 
     filename = f"{output_dir}/screenshot_{model}_{width}x{scroll_height}.png"
     driver.save_screenshot(filename)
-    print(f"[✔] Capture enregistrée : {filename}")
+    logging.info(f"[✅ - Capture enregistrée : {filename}")
+
     driver.quit()
+logging.info("✅ - Scrapping terminé avec succès.")
