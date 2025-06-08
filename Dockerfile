@@ -2,20 +2,10 @@ FROM python:3.10-slim
 
 # Installation de dépendances système
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    gnupg \
-    fonts-liberation \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    xdg-utils \
+    wget unzip curl gnupg \
+    fonts-liberation libnss3 libxss1 libasound2 libx11-xcb1 \
+    libxcomposite1 libxdamage1 libxrandr2 libgbm1 xdg-utils \
+    libgconf-2-4 libgtk-3-0 libxext6 libxi6 libxtst6 libxrender1 libxcb1 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 

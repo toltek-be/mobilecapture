@@ -1,8 +1,18 @@
 import os
 import time
 import logging
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
+chrome_options = Options()
+chrome_options.add_argument("--headless=new")  # ou "--headless=chrome"
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--window-size=1920,1080")
+
+
+
 
 # Configuration du logging
 logging.basicConfig(
@@ -75,16 +85,17 @@ resolutions = [
 output_dir = "screenshots"
 os.makedirs(output_dir, exist_ok=True)
 
+# Sous-répertoire avec date (ex: 2025-06-07)
+timestamp = datetime.now().strftime("%Y-%m-%d")
+session_dir = os.path.join(output_dir, timestamp)
+os.makedirs(session_dir, exist_ok=True)
+
+
+
+# Change la taille de la fenêtre à chaque itération
 for width, height, model in resolutions:
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument(f"--window-size={width},{height}")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
     driver = webdriver.Chrome(options=chrome_options)
-
+    driver.set_window_size(width, height)
     logging.info(f"{model} {width}x{height} - Chargement de la page {url}")
     driver.get(url)
     time.sleep(delay)
@@ -100,9 +111,9 @@ for width, height, model in resolutions:
     driver.set_window_size(width, scroll_height)
     time.sleep(1)
 
-    filename = f"{output_dir}/screenshot_{model}_{width}x{scroll_height}.png"
+    filename = f"{session_dir}/screenshot_{model}_{width}x{scroll_height}.png"
     driver.save_screenshot(filename)
-    logging.info(f"[✅ - Capture enregistrée : {filename}")
-
+    logging.info(f"✅ - Capture enregistrée : {filename}")
     driver.quit()
-logging.info("✅ - Scrapping terminé avec succès.")
+
+logging.info("🎯 - Scrapping terminé avec succès.")
